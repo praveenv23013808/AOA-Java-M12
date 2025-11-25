@@ -1,30 +1,59 @@
 
-# EX 2E Pattern Matching using KMP Algorithm.
+# EX 2C Job Sequencing using Greedy Approach
 ## DATE:09/10/25
 ## AIM:
-To write a Java program for the following constraints.
-Longest Palindromic Substring
-Given a string s, return the longest palindromic substring in s.
-using Manacher's Algorithm
+To write a Java program to for given constraints.
+Given an integer array nums and an integer k, return the number of pairs (i, j) where i < j such that |nums[i] - nums[j]| == k.
+
+The value of |x| is defined as:
+
+x if x >= 0.
+-x if x < 0.You're given N jobs, each with:
+
+A unique jobId
+
+A deadline (by which it must be completed)
+
+A profit (earned only if completed on or before the deadline)
+
+Each job:
+
+Takes exactly 1 unit of time
+
+Only one job can be done at a time
+
+Your goal is to maximize total profit while completing the maximum number of jobs possible within their deadlines.
 
 ## Algorithm
-1. Input number of test cases T
-2. Repeat the following steps for each test case:
-Read the input text.
-Read the input pattern.
-Initialize an empty list result to store the starting indices of matches.
-n = length of text
-m = length of pattern
-3. Slide the pattern over the text:
-For each position i from 0 to n - m:
-Compare each character of pattern with the substring of text starting at index i.
-Initialize j = 0.
-While j < m and text[i + j] == pattern[j], continue comparing.
-If all characters match (j == m), add index i to result.
-4. Check if no match is found:
-If result is empty, add -1 to indicate that the pattern was not found. 
-5. Print all indices in result.
-
+1. Input:
+Read the number of jobs n.
+For each job, read:
+id → unique job identifier
+deadline → latest time by which the job should be completed
+profit → profit gained if the job is completed before or on its deadline
+2. Sort Jobs by Profit:
+Sort all jobs in descending order of profit (highest profit first).
+This ensures we pick the most profitable jobs before less profitable ones.
+3. Find the Maximum Deadline:
+Determine the largest deadline among all jobs (maxDeadline).
+This helps define the number of available time slots.
+4. Initialize Scheduling Slots:
+Create a boolean array slot[maxDeadline + 1], where each index represents a time slot.
+Initially, all slots are false (unoccupied).
+Initialize counters:
+jobsDone = 0 → total number of jobs scheduled
+totalProfit = 0 → total profit earned
+5. Schedule the Jobs:
+For each job in sorted order:
+Check from its deadline slot backward (to schedule it as late as possible).
+If an empty slot (slot[j] == false) is found:
+Mark it as occupied (slot[j] = true).
+Increment jobsDone.
+Add the job’s profit to totalProfit.
+Break (move to next job).
+6.Output:
+Return {jobsDone, totalProfit}.
+Print the number of jobs scheduled and total profit obtained.
 ## Program:
 ```
 /*
@@ -33,55 +62,62 @@ Developed by: Dhiyaneshwar P
 Register Number:212222110009
 import java.util.*;
 
-public class PatternMatching {
+public class JobScheduling {
 
-    public static List<Integer> findPatternIndices(String text, String pattern) {
-       //Type code here...
-       List<Integer>result=new ArrayList<>();
-       int n=text.length();
-       int m=pattern.length();
-       for(int i=0;i<=n-m;i++){
-           int j;
-           for(j=0;j<m;j++){
-               if(text.charAt(i+j)!=pattern.charAt(j)){
-                   break;
-               }
-           }
-           if(j==m){
-               result.add(i);
-           }
-       }
-       if(result.isEmpty()){
-           result.add(-1);
-       }
-       return result;
+    static class Job {
+        int id, deadline, profit;
+
+        Job(int id, int deadline, int profit) {
+            this.id = id;
+            this.deadline = deadline;
+            this.profit = profit;
+        }
+    }
+
+    public static int[] jobScheduling(Job[] jobs, int n) {
+        // Type Your Code Here.
+        Arrays.sort(jobs,(a,b)->b.profit-a.profit);
+        int maxDeadline=0;
+        for (Job job:jobs){
+            maxDeadline =Math.max(maxDeadline,job.deadline);
+        }
+        boolean[] slot=new boolean[maxDeadline+1];
+        int jobsDone=0,totalProfit=0;
+        for(Job job:jobs){
+            for(int j=job.deadline;j>0;j--){
+                if(!slot[j]){
+                    slot[j]=true;
+                    jobsDone++;
+                    totalProfit+=job.profit;
+                    break;
+                }
+            }
+        }
+        return new int[]{jobsDone,totalProfit};
     }
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        Job[] jobs = new Job[n];
 
-        int T = Integer.parseInt(scanner.nextLine()); // number of test cases
-
-        for (int t = 0; t < T; t++) {
-            String text = scanner.nextLine();
-            String pattern = scanner.nextLine();
-
-            List<Integer> indices = findPatternIndices(text, pattern);
-            for (int idx : indices) {
-                System.out.print(idx + " ");
-            }
-            System.out.println();
+        for (int i = 0; i < n; i++) {
+            int id = sc.nextInt();
+            int deadline = sc.nextInt();
+            int profit = sc.nextInt();
+            jobs[i] = new Job(id, deadline, profit);
         }
 
-        scanner.close();
+        int[] result = jobScheduling(jobs, n);
+        System.out.println(result[0] + " " + result[1]);
     }
 }
-  
+
 */
 ```
 
 ## Output:
-<img width="691" height="293" alt="image" src="https://github.com/user-attachments/assets/2f0003dc-92a9-4093-ae7d-12849bc77a76" />
+<img width="368" height="421" alt="image" src="https://github.com/user-attachments/assets/c70c2a17-df16-435f-acba-232361e247a1" />
 
 
 
